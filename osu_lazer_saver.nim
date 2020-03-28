@@ -1,6 +1,6 @@
-# Exports all songs (mp3) from osu!lazer 
+# Exports all songs (mp3) from osu!lazer
 # to the songs folder from current directory.
-# The SQL query might be not the best one, 
+# The SQL query might be not the best one,
 # but it works for me, and I don't really know SQL :P
 #
 # Also that SQL query might break if osu!lazer DB schema changes, YMMV
@@ -10,7 +10,7 @@ const SongQuery = sql"""
 select
   BeatmapMetadata.Artist,
   BeatmapMetadata.Author,
-  BeatmapMetadata.Title, 
+  BeatmapMetadata.Title,
   BeatmapSetInfo.OnlineBeatmapSetID,
   FileInfo.Hash
 from
@@ -18,7 +18,7 @@ from
     join BeatmapSetInfo
       on BeatmapMetadata.ID=BeatmapSetInfo.MetadataID
 		join BeatmapSetFileInfo
-			on BeatmapSetFileInfo.BeatmapSetInfoID=BeatmapSetInfo.ID 
+			on BeatmapSetFileInfo.BeatmapSetInfoID=BeatmapSetInfo.ID
       AND BeatmapSetFileInfo.Filename=BeatmapMetadata.AudioFile
 		join FileInfo
 			on FileInfo.ID=BeatmapSetFileInfo.FileInfoID

@@ -4,3 +4,4 @@
 !*.*
 # Unignore all dirs
 !*/
+secret.key
