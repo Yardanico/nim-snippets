@@ -2,6 +2,10 @@
 # for "banning" specific words or phrases. Intended
 # to be used as a game, like trying to write messages without 
 # the word "that" or without the letter "a"
+#
+# Don't forget to edit privacy settings in @BotFather 
+# via /setprivacy command, because otherwise the bot will not
+# be able to see messages apart from commands sent to it
 import asyncdispatch, logging, options
 import strformat, sequtils, unicode
 import strutils except strip, split
