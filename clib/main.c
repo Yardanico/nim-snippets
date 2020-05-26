@@ -8,7 +8,7 @@ int main() {
   void* lib_handle;
   // Function definitions
   void* (*new_evaluator)();
-  double (*eval)(void* e, const char * data, int* code);
+  double (*eval)(void* e, const char* data, int* code);
   void (*free_evaluator)(void* e);
 
   // Load the library
@@ -24,11 +24,16 @@ int main() {
   free_evaluator = dlsym(lib_handle, "free_evaluator");
   // Create a new evaluator
   void* e = new_evaluator();
-  // If non zero - there was an error
-  int* code;
+  int code;
   // Calculate expression
-  double res = eval(e, "2+2*2", code);
-  printf("%f\n", res);
+  double res = eval(e, "2+2*2", &code);
+  // If non zero - there was an error
+  if (code != 0) {
+    fprintf(stderr, "eval() failed with error code %i\n", code);
+  }
+  else {
+    printf("%f\n", res);
+  }
   // Free the object
   free_evaluator(e);
   // Close the handle
