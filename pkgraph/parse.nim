@@ -4,22 +4,39 @@ import std / [
   strutils, sequtils, strformat,
   tables, json
 ]
+
 import npeg
+import npeg/lib/utf8
 
 type
   PackageData = object
     pkgs: seq[string]
     path: string
+    author: string
+    license: string
+    version: string
 
-let parser = peg("file", req: seq[string]):
+let parser = peg("file", req: PackageData):
+
   nl <- {' ', '\t', '\9' .. '\13'}
 
   entry <- '"' * >*(Print - '"') * '"':
-    req.add $1
+    req.pkgs.add $1
+  
+  requires <- *nl * i"requires" * *nl * ?':' * *nl * ?'(' * *(entry * ?',' * *nl) * ?')'
 
-  requires <- i"requires" * *nl * ?':' * *nl * ?'(' * *(entry * ?',' * *nl) * ?')' * *nl
+  parseField(name) <- ?*nl * name * *nl * (':' | '=') * *nl * '"' * >*(utf8.any - '"') * '"'
 
-  file <- *@requires
+  license <- parseField("license"):
+    req.license = $1
+  
+  author <- parseField("author"):
+    req.author = ($1).replace("'", "\\'")
+  
+  version <- parseField("version"):
+    req.version = $1
+
+  file <- *@(version | author | license | requires)
 
 # For resolving aliases
 let x = parseFile("pkgs.json")
@@ -48,12 +65,12 @@ proc findNimble(path: string): string =
 
 proc addNimbleToGraph(graph: TableRef[string, PackageData], pkgname, path: string) = 
   let data = readFile(path)
-  var pkgsRaw: seq[string]
-  var m = parser.match(data, pkgsRaw)
+  var pkgData = PackageData(path: path)
+  var m = parser.match(data, pkgData)
   if m.ok != true:
     raise newException(ValueError, "Can't parse " & path)
   var pkgs: seq[string]
-  for pkg in pkgsRaw:
+  for pkg in pkgData.pkgs:
     # Even after parsing we might have entries with multiple pkgs
     let splut = pkg.split(",").filterIt(it != "").mapIt(it.strip())
     for temp in splut:
@@ -63,7 +80,9 @@ proc addNimbleToGraph(graph: TableRef[string, PackageData], pkgname, path: strin
         name = aliases[name]
       # unixcmd was commented
       if name notin ["nim", "nimrod", "unixcmd"]: pkgs.add name
-  graph[normalize(pkgname)] = PackageData(path: path, pkgs: pkgs.deduplicate())
+  # update with new packages
+  pkgData.pkgs = pkgs.deduplicate()
+  graph[normalize(pkgname)] = pkgData
 
 proc main =
   var graph = newTable[string, PackageData](2048)
@@ -135,7 +154,12 @@ proc main =
   for key, val in graph:
     let strId = "id" & $i
     nameToId[key] = strId
-    createStmts.add fmt"create ({strId}:package {{pkgname: '{key}'}})"
+    var props = ""
+    props.add &"pkgname: '{key}', "
+    props.add &"author: '{val.author}', "
+    props.add &"license: '{val.license}', "
+    props.add &"version: '{val.version}'"
+    createStmts.add fmt"create ({strId}:package {{{props}}})"
     inc i
   # second pass: populate relations
   for key, val in graph:
