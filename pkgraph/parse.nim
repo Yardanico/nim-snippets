@@ -135,32 +135,31 @@ proc main =
     relationStmts: seq[string]
   
   var nameToId = newTable[string, string](2048)
+  var authorToId = newTable[string, string](512)
   var i = 0
-  #[
-    create (id1:package {pkgname: "nimwc"})
-    create (id2:package {pkgname: "jester"})
-    create (id3:package {pkgname: "bcrypt"})
-    create (id4:package {pkgname: "firejail"})
-    create (id5:package {pkgname: "httpbeast"})
-    create (id6:package {pkgname: "datetime2human"})
-    create (id1)-[:depends_on]->(id6)
-    create (id1)-[:depends_on]->(id3)
-    create (id1)-[:depends_on]->(id2)
-    create (id1)-[:depends_on]->(id4)
-    create (id2)-[:depends_on]->(id5)
-  ]#
-  # two passes:
-  # first one: populate all create statements with IDs
-  for key, val in graph:
+  
+  template getId: string = 
     let strId = "id" & $i
+    inc i
+    strId
+  # two passes:
+  # first one: populate all create statements with IDs and authors
+  for key, val in graph:
+    let strId = getId()
     nameToId[key] = strId
     var props = ""
     props.add &"pkgname: '{key}', "
-    props.add &"author: '{val.author}', "
+    # props.add &"author: '{val.author}', "
     props.add &"license: '{val.license}', "
     props.add &"version: '{val.version}'"
     createStmts.add fmt"create ({strId}:package {{{props}}})"
-    inc i
+    if val.author notin authorToId:
+      let authorId = getId()
+      createStmts.add fmt"create ({authorId}:author {{name: '{val.author}'}})"
+      authorToId[val.author] = authorId
+    else:
+      let authorId = authorToId[val.author]
+      relationStmts.add fmt"create ({strId})-[:authored_by]->({authorId})"
   # second pass: populate relations
   for key, val in graph:
     for pkg in val.pkgs:
@@ -169,10 +168,9 @@ proc main =
         relationStmts.add fmt"create ({varname})-[:depends_on]->({nameToId[pkg]})"
       # for non-nimble dependencies (github, etc)
       elif "://" in pkg:
-        let strId = "id" & $i
+        let strId = getId()
         createStmts.add fmt"create ({strId}:package {{pkgname: '{pkg}'}})"
         relationStmts.add fmt"create ({varname})-[:depends_on]->({strId})"
-        inc i
       else:
         quit pkg
   
