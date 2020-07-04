@@ -1,5 +1,9 @@
 # TODO: Handle comments before requires
-import os, strutils, sequtils, tables, json
+import std / [
+  os, 
+  strutils, sequtils, strformat,
+  tables, json
+]
 import npeg
 
 type
@@ -94,22 +98,76 @@ proc main =
         quit "Can't find .nimble file"
       graph.addNimbleToGraph(pkgName, nimbleFile)
 
-  var outf = open("deps_nothing.dot", fmWrite)
-  outf.writeLine "digraph data {"
+  # .dot graphviz output
+  when false:
+    var outf = open("deps_nothing.dot", fmWrite)
+    outf.writeLine "digraph data {"
+    for key, val in graph:
+      # Package doesn't depend on anything
+      if val.pkgs.len == 0:
+        outf.writeLine "\"$1\";" % [key]
+      else:
+        for pkg in val.pkgs:
+          outf.writeLine "\"$1\" -> \"$2\";" % [key, pkg]
+    outf.writeLine "}"
+    outf.close()
+  var
+    createStmts: seq[string]
+    relationStmts: seq[string]
+  
+  var nameToId = newTable[string, string](2048)
+  var i = 0
+  #[
+    create (id1:package {pkgname: "nimwc"})
+    create (id2:package {pkgname: "jester"})
+    create (id3:package {pkgname: "bcrypt"})
+    create (id4:package {pkgname: "firejail"})
+    create (id5:package {pkgname: "httpbeast"})
+    create (id6:package {pkgname: "datetime2human"})
+    create (id1)-[:depends_on]->(id6)
+    create (id1)-[:depends_on]->(id3)
+    create (id1)-[:depends_on]->(id2)
+    create (id1)-[:depends_on]->(id4)
+    create (id2)-[:depends_on]->(id5)
+  ]#
+  # two passes:
+  # first one: populate all create statements with IDs
   for key, val in graph:
-    # Package doesn't depend on anything
-    if val.pkgs.len == 0:
-      outf.writeLine "\"$1\";" % [key]
-    else:
-      for pkg in val.pkgs:
-        outf.writeLine "\"$1\" -> \"$2\";" % [key, pkg]
-    # Sanity check to see if we have dependencies which are not in our table
-    for v in val.pkgs:
+    let strId = "id" & $i
+    nameToId[key] = strId
+    createStmts.add fmt"create ({strId}:package {{pkgname: '{key}'}})"
+    inc i
+  # second pass: populate relations
+  for key, val in graph:
+    for pkg in val.pkgs:
+      let varname = nameToId[key]
+      if pkg in nameToId:
+        relationStmts.add fmt"create ({varname})-[:depends_on]->({nameToId[pkg]})"
+      # for non-nimble dependencies (github, etc)
+      elif "://" in pkg:
+        let strId = "id" & $i
+        createStmts.add fmt"create ({strId}:package {{pkgname: '{pkg}'}})"
+        relationStmts.add fmt"create ({varname})-[:depends_on]->({strId})"
+        inc i
+      else:
+        quit pkg
+  
+  when false:
+    for key, val in graph:
+      # Sanity check to see if we have dependencies which are not in our table
       # Don't check https
-      if "://" notin v and v notin graph:
-        echo "Can't find ", v
+      if "://" notin pkg and pkg notin graph:
+        echo "Can't find ", pkg
         echo key, " ", val
-  outf.writeLine "}"
+  
+  var outf = open("populate.cypher", fmWrite)
+
+  for create in createStmts:
+    outf.writeLine create
+  
+  for relate in relationStmts:
+    outf.writeLine relate
+  
   outf.close()
   echo graph.len
 
