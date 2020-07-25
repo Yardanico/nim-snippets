@@ -180,10 +180,33 @@ proc saveSqlite =
         else:
           msg = origMsg
         "IRC"
-      
+    
+    nick = nick.toLowerAscii().strip(chars = {'_'})
+    nick = nick.multiReplace({
+      "araq_win": "araq",
+      "araq0": "araq",
+      "araqintrouble": "araq",
+      "dom96_and": "dom96",
+      "dom96_w": "dom96",
+      "dom96-": "dom96",
+      "dom96_mobile": "dom96",
+      "dom96|w": "dom96",
+      "dom96_test": "dom96",
+      "zacharycarter_ir": "zacharycarter",
+      "zachary carter": "zacharycarter",
+      "zachcarter": "zacharycarter",
+      "tiberiumn": "yardanico",
+      "tiberium": "yardanico",
+      "technicae circuit": "technisha circuit",
+      "varriount|mobile": "varriount",
+      "liblq-dev": "lqdev",
+      "alehander42": "alehander92",
+      "elegant beef": "never listen to beef",
+      "def-pri-pub": "def-"
+    })
     db.exec(
       sql"insert into log (timestamp, author, message, service, kind) values (?, ?, ?, ?, ?)",
-      ev.timestamp, nick.toLowerAscii().strip(chars = {'_'}), msg, service, action
+      ev.timestamp, nick, msg, service, action
     )
 
   db.exec(sql"end transaction")
