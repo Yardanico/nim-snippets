@@ -5,6 +5,9 @@
 
   Uses two separate steps for initial parsing and saving (using frosty),
   and then loading (with frosty) and inserting to SQLite.
+
+  Using some post-processing (e.g. to replace different nicknames for people)
+  and to remove IRC colors
 ]#
 
 import std / [
@@ -14,7 +17,10 @@ import std / [
   htmlparser, xmltree, strtabs
 ]
 import irc
+import regex
 import frosty
+
+{.experimental: "strictFuncs".}
 
 #[
 No logs between 2012-07-06T00:00:00Z and 2012-07-04T00:00:00Z!
@@ -180,7 +186,8 @@ proc saveSqlite =
         else:
           msg = origMsg
         "IRC"
-    
+    const stripIrc = re"[\x02\x1F\x0F\x16\x1D]|\x03(\d\d?(,\d\d?)?)?"
+    msg = msg.replace(stripIrc, "")
     nick = nick.toLowerAscii().strip(chars = {'_'})
     nick = nick.multiReplace({
       "araq_win": "araq",
@@ -202,7 +209,8 @@ proc saveSqlite =
       "liblq-dev": "lqdev",
       "alehander42": "alehander92",
       "elegant beef": "never listen to beef",
-      "def-pri-pub": "def-"
+      "def-pri-pub": "def-",
+      "aeverr": "rika"
     })
     db.exec(
       sql"insert into log (timestamp, author, message, service, kind) values (?, ?, ?, ?, ?)",

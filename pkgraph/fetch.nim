@@ -1,7 +1,7 @@
 import std / [os, osproc, json, strscans, strutils, strformat]
 
-# pkgs.json is packages.json from nimble
-let data = parseFile("pkgs.json")
+# https://raw.githubusercontent.com/nim-lang/packages/master/packages.json
+let data = parseFile("packages.json")
 
 var cmds: seq[string]
 
@@ -15,7 +15,7 @@ for pkg in data:
     url = url.replace("?subdir=" & subdir, "")
   
   # We already cloned it
-  if existsDir(dir):
+  if dir.dirExists():
     # Add subdir info to an existing repo
     if subdir != "":
       var f = open(dir / "subdir.meta", fmAppend)
