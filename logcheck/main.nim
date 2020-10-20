@@ -14,13 +14,16 @@ import std / [
   os, strutils, strformat, 
   db_sqlite, times, sequtils, algorithm, streams,
   marshal, strtabs, monotimes, strscans,
-  htmlparser, xmltree, strtabs
+  htmlparser, xmltree, strtabs, json
 ]
+
+# Nimble
 import irc
 import regex
 import frosty
 
-{.experimental: "strictFuncs".}
+when defined(nimHasStrictFuncs):
+  {.experimental: "strictFuncs".}
 
 #[
 No logs between 2012-07-06T00:00:00Z and 2012-07-04T00:00:00Z!
@@ -54,6 +57,28 @@ type
     message: string
 
 
+#[
+  {
+    "Field0": 1540946797 <- this, 
+    "Field1": {
+      "typ": "EvMsg",  <- this
+      "cmd": "MQuit", 
+      "nick": "platoff", 
+      "user": "~textual", 
+      "host": "6.152.140.77.rev.sfr.net", 
+      "servername": "", 
+      "numeric": null, 
+      "tags": [
+        30648336, {"counter": 0, "data": [{"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}, {"Field0": null, "Field1": null}], "mode": "modeCaseSensitive"}
+      ], 
+      "params": ["Quit: My MacBook has gone to sleep. ZZZzzz…"], <- this
+      "origin": "Quit: My MacBook has gone to sleep. ZZZzzz…", <- this
+      "raw": ":platoff!~textual@6.152.140.77.rev.sfr.net QUIT :Quit: My MacBook has gone to sleep. ZZZzzz…",
+      "timestamp": 1540946797
+    }
+  }
+]#
+
 const logDir = "irclogs"
 
 var dates: seq[DateTime]
@@ -72,18 +97,23 @@ proc parseFile(path: string) =
   dates.add date
 
   if ext == ".logs":
-    var entry: LegacyEntry
-
     var i = 0
     for line in lines(path):
+      var line = line
+      # skip timestamp
       if i == 0: 
         inc i 
         continue
+      # Skip empty lines
       if line.strip() == "": continue
-      newStringStream(line).load(entry)
-      let ev = entry.msg
-      if ev.typ == EvMsg and ev.params.len > 1 and ev.origin[0] == '#':
-        msgs.add Entry(timestamp: entry.time, author: ev.nick, message: ev.params[1])
+      #for field in ["numeric", "user", "host", "servername", "raw", "Field0", "Field1"]:
+      #  line = line.replace("\"" & field & "\": null", "\"" & field & "\": \"\"")
+      # Unmarshal
+      let entry = parseJson(line)
+      let ev = entry["Field1"]
+      # If it's a normal message
+      if ev["typ"].getStr() == "EvMsg" and ev["params"].getElems().len > 1 and ev["origin"].getStr()[0] == '#':
+        msgs.add Entry(timestamp: entry["Field0"].getInt(), author: ev["nick"].getStr(), message: ev["params"].getElems()[1].getStr())
   
   elif ext == ".html":
     let data = loadHtml(path)
@@ -98,7 +128,7 @@ proc parseFile(path: string) =
 proc saveInitial = 
   var start = getMonoTime()
   for (pc, path) in walkDir(logDir):
-    parseFile(path)
+    if pc == pcFile: parseFile(path)
   echo "Parsed all messages!", (getMonoTime() - start)
   start = getMonoTime()
 
@@ -156,7 +186,7 @@ proc saveSqlite =
     var msg = ""
     var action = "Message"
     let service = 
-      if nick.startsWith("FromDiscord") or nick.startsWith("GitDisc"):
+      if nick.startsWith("FromDiscord") or nick.startsWith("GitDisc") or nick.startsWith("nid"):
         if origMsg.startsWith("Uptime - ") or origMsg.startsWith("Don't have info for the current"): continue
         if scanf(origMsg, "ACTION <$+> $+", nick, msg):
           action = "Action"
@@ -210,7 +240,10 @@ proc saveSqlite =
       "alehander42": "alehander92",
       "elegant beef": "never listen to beef",
       "def-pri-pub": "def-",
-      "aeverr": "rika"
+      "aeverr": "rika",
+      "leorize[m]": "leorize",
+      "leorize[m]1": "leorize",
+      "leorize_m": "leorize"
     })
     db.exec(
       sql"insert into log (timestamp, author, message, service, kind) values (?, ?, ?, ?, ?)",
@@ -221,5 +254,5 @@ proc saveSqlite =
   db.close()
 
 
-#saveInitial()
+saveInitial()
 saveSqlite()
