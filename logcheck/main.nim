@@ -109,7 +109,12 @@ proc parseFile(path: string) =
       #for field in ["numeric", "user", "host", "servername", "raw", "Field0", "Field1"]:
       #  line = line.replace("\"" & field & "\": null", "\"" & field & "\": \"\"")
       # Unmarshal
-      let entry = parseJson(line)
+      var entry: JsonNode
+      try:
+        entry = parseJson(line)
+      except:
+        echo "failed to parse line", line
+        continue
       let ev = entry["Field1"]
       # If it's a normal message
       if ev["typ"].getStr() == "EvMsg" and ev["params"].getElems().len > 1 and ev["origin"].getStr()[0] == '#':
