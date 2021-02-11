@@ -133,7 +133,9 @@ proc parseFile(path: string) =
 proc saveInitial = 
   var start = getMonoTime()
   for (pc, path) in walkDir(logDir):
-    if pc == pcFile: parseFile(path)
+    if pc == pcFile: 
+      echo "Parsing ", path
+      parseFile(path)
   echo "Parsed all messages!", (getMonoTime() - start)
   start = getMonoTime()
 
@@ -203,6 +205,10 @@ proc saveSqlite =
         nick = nick[0 .. ^4]
         msg = origMsg
         "Matrix"
+      elif nick.endsWith "[m]1":
+        nick = nick[0 .. ^5]
+        msg = origMsg
+        "Matrix"
       elif nick.startsWith "FromGitter":
         # Special case for when FromGitter splits big messages
         if origMsg.startsWith("... "):
@@ -243,9 +249,13 @@ proc saveSqlite =
       "varriount|mobile": "varriount",
       "liblq-dev": "lqdev",
       "alehander42": "alehander92",
-      "elegant beef": "never listen to beef",
+      "never listen to beef": "elegantbeef",
+      "elegant beef": "elegantbeef",
       "def-pri-pub": "def-",
+      "genotrace": "shashlick",
+      "bung": "bung87",
       "aeverr": "rika",
+      "leorize1": "leorize",
       "leorize[m]": "leorize",
       "leorize[m]1": "leorize",
       "leorize_m": "leorize"
