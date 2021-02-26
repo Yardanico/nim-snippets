@@ -26,7 +26,7 @@ type
   Register = object
     regs: array[7, Septit]
   
-  Interpreter = ref object
+  Interpreter = object
     ip: int # Instruction pointer
     ipLen: int # base-7 length of instruction pointer
     r: Register # Interpreter registers
