@@ -5,3 +5,4 @@
 # Unignore all dirs
 !*/
 secret.key
+logcheck/irclogs
