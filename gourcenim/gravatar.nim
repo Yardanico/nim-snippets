@@ -1,102 +1,45 @@
 import std/[strutils, httpclient, tables, unicode, md5]
+import common
 
-const 
+const
   outDir = "avatars"
   usersFile = "users.txt"
 
-  normalizedMapping = {
-    "Andreas Rumpf": "Andreas Rumpf (Araq)",
-    "Araq": "Andreas Rumpf (Araq)",
+proc getEmails = 
+  var userToEmail: Table[string, string]
 
-    "Dominik Picheta": "Dominik Picheta (dom96)",
-    "dom96": "Dominik Picheta (dom96)",
+  for line in lines(usersFile):
+    # only split once in a rare case there's a colon in a name
+    let data = line.split(':', maxsplit = 1)
+    # not a full entry
+    if data[0].len == 0:
+      continue
     
-    "Yuriy Glukhov": "Yuriy Glukhov (yglukhov)",
-    "yglukhov": "Yuriy Glukhov (yglukhov)",
+    var (email, name) = (data[0], data[1])
+    let maybeName = normalizedMappingTable.getOrDefault(name)
+    if maybeName != "": name = maybeName
 
-    "Zahary Karadjov": "Zahary Karadjov (zah)",
-    "zah": "Zahary Karadjov (zah)",
+    userToEmail[name] = email
 
-    "Arne Döring": "Arne Döring (krux02)",
+const gourceLog = "nimrepo.txt"
+proc fixGourceLog = 
+  var newFile = open("nimfixed.txt", fmWrite)
 
-    "Andy Davidoff": "Andy Davidoff (disruptek)",
-    "Bad Dog": "Andy Davidoff (disruptek)",
+  # We can't use multiReplace because filenames
+  # might intersect with usernames
+  for line in lines(gourceLog):
+    # format is
+    # 1214144051|Andreas Rumpf|A|/configure
+    # timestamp|name|action|path
+    var data = line.split('|')
+    doAssert data.len == 4, line
 
-    "Ganesh Viswanathan": "Ganesh Viswanathan (genotrace)",
-    "genotrace": "Ganesh Viswanathan (genotrace)",
+    # replace the name
+    let maybeName = normalizedMappingTable.getOrDefault(data[1])
+    if maybeName != "": data[1] = maybeName
 
-    "Danil Yarantsev": "Danil Yarantsev (Yardanico)",
-    "Daniil Yarancev": "Danil Yarantsev (Yardanico)",
-
-    "Dennis Felsing": "Dennis Felsing (def)",
-    "def": "Dennis Felsing (def)",
-
-    "reactormonk": "Simon Hafner (reactormonk)",
-    "Simon Hafner": "Simon Hafner (reactormonk)",
-
-    "alaviss": "Leorize",
-
-    "Sebastian Schmidt": "Sebastian Schmidt (Vindaar)",
-    "Vindaar": "Sebastian Schmidt (Vindaar)",
-
-    "Eugene Kabanov": "Eugene Kabanov (cheatfate)",
-    "cheatfate": "Eugene Kabanov (cheatfate)",
-
-    "Euan": "euantorano",
-    "Euan T": "euantorano",
-    "Euan Torano": "euantorano",
-
-    "ephja": "Erik Johansson Andersson (ephja)",
-    "Erik Johansson Andersson": "Erik Johansson Andersson (ephja)",
-
-    "enthus1ast": "David Krause (enthus1ast)",
-    "David Krause": "David Krause (enthus1ast)",
-
-    "Ico Doornekamp": "Ico Doornekamp (zevv)",
-
-    "Flaviu Tamas": "Flaviu Tamas (flaviut)",
-
-    "Oscar Nihlgård": "Oscar Nihlgård (GULPF)",
-
-    "Jacek Sieka": "Jacek Sieka (arnetheduck)",
-
-    "Clay Sweetser": "Clay Sweetser (Varriount)",
-    "Varriount": "Clay Sweetser (Varriount)",
-
-    "nc-x": "Neelesh Chandola (nc-x)",
-    "Neelesh Chandola": "Neelesh Chandola (nc-x)",
-
-    "Charles Blake": "Charles Blake (cblake)",
-
-    "Dmitry Atamanov": "Dmitry Atamanov (data-man)",
-    "data-man": "Dmitry Atamanov (data-man)",
-    
-    "Miran": "narimiran",
-
-    "Mamy André-Ratsimbazafy": "Mamy Ratsimbazafy (mratsim)",
-    "Mamy Ratsimbazafy": "Mamy Ratsimbazafy (mratsim)",
-
-    "Constantine Molchanov": "Constantine Molchanov (moigagoo)",
-    "Константин Молчанов": "Constantine Molchanov (moigagoo)",
-    "Konstantin Molchanov": "Constantine Molchanov (moigagoo)",
-
-    "gmpreussner": "Gerke Max Preussner (gmpreussner)",
-    "cooldome": "Andrii Riabushenko (cooldome)"
-  }.toTable
-
-var userToEmail: Table[string, string]
-
-for line in lines(usersFile):
-  # only split once in a rare case there's a colon in a name
-  let data = line.split(':', maxsplit = 1)
-  # not a full entry
-  if data[0].len == 0:
-    continue
+    newFile.writeLine(data.join("|"))
   
-  var (email, name) = (data[0], data[1])
-  let maybeName = normalizedMapping.getOrDefault(name)
-  if maybeName != "": name = maybeName
+  newFile.close()
 
-  userToEmail[name] = email
-
-echo userToEmail.len
+fixGourceLog()
