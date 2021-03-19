@@ -17,9 +17,16 @@ git -C nim log --pretty=format:"%ae:%an" | tac > users.txt
 ```
 
 ```
-Convert Nim repo into a custom log (so that we can replace users)
+# Convert Nim repo into a custom log (so that we can replace users)
 gource --output-custom-log nimrepo.txt nim
+
+# Do the actual replacement
+nim c -r gravatar.nim
+
+# Start gource with the config file
+gource --load-config gource.cfg
 ```
+
 
 
 Full Gource help:

@@ -49,6 +49,10 @@ const
     "Euan T": "euantorano",
     "Euan Torano": "euantorano",
 
+
+    "PMunch": "Peter Munch-Ellingsen (PMunch)",
+    "Peter Munch-Ellingsen": "Peter Munch-Ellingsen (PMunch)",
+
     "ephja": "Erik Johansson Andersson (ephja)",
     "Erik Johansson Andersson": "Erik Johansson Andersson (ephja)",
 
@@ -72,7 +76,8 @@ const
     "nc-x": "Neelesh Chandola (nc-x)",
     "Neelesh Chandola": "Neelesh Chandola (nc-x)",
 
-    "Charles Blake": "Charles Blake (cblake)",
+    "Charles Blake": "Charles Blake (c-blake)",
+    "c-blake": "Charles Blake (c-blake)",
 
     "Dmitry Atamanov": "Dmitry Atamanov (data-man)",
     "data-man": "Dmitry Atamanov (data-man)",
