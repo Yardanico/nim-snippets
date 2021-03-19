@@ -1,0 +1,39 @@
+query MyQuery {
+  repository(name: "nim", owner: "nim-lang") {
+    defaultBranchRef {
+      target {
+        ... on Commit {
+          history(first: 100) {
+            pageInfo {
+              hasNextPage
+              # cursor to the next page
+              endCursor
+            }
+            edges {
+              node {
+                ... on Commit {
+                  id
+                  # GitHub author
+                  authors(first: 1) {
+                    nodes {
+                      name
+                      # GitHub user
+                      user {
+                        # Avatar url
+                        avatarUrl(size: 90)
+                      }
+                    }
+                  }
+                  # Git author name
+                  author {
+                    name
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

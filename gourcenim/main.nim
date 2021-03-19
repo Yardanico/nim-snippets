@@ -1,13 +1,21 @@
-import std/[strutils, httpclient, tables, unicode, md5]
+import std/[
+  os, strutils, httpclient,
+  tables, unicode, md5, strscans
+]
 import common
 
 const
   outDir = "avatars"
   usersFile = "users.txt"
 
-proc getEmails = 
-  var userToEmail: Table[string, string]
 
+# See https://docs.github.com/en/rest/reference/repos#list-commits
+# Our goal is to get all avatars for all commits and map them
+# to the names that we have
+
+
+
+proc getEmails: Table[string, string] = 
   for line in lines(usersFile):
     # only split once in a rare case there's a colon in a name
     let data = line.split(':', maxsplit = 1)
@@ -19,7 +27,21 @@ proc getEmails =
     let maybeName = normalizedMappingTable.getOrDefault(name)
     if maybeName != "": name = maybeName
 
-    userToEmail[name] = email
+    result[name] = email
+
+proc downloadAvatars(users: Table[string, string]) = 
+  for name, email in users:
+    var ghId, ghName, temp: string
+    var url = "https://avatars.githubusercontent.com/"
+    # 106477+ba0f3@users.noreply.github.com:Huy
+    # get avatar from the user id or username
+    if scanf(email, "$++$+@users.noreply.github.com", ghId, ghName):
+      url.add "u/" & ghId & "?size=90"
+    elif scanf(email, "$+@users.noreply.github.com", ghName):
+      url.add ghName & "?size=90"
+    else:
+      url = "https://www.gravatar.com/avatar/" & getMd5(email) & "?d=404&size=90"
+    echo name, " ", url
 
 const gourceLog = "nimrepo.txt"
 proc fixGourceLog = 
@@ -42,4 +64,6 @@ proc fixGourceLog =
   
   newFile.close()
 
+let emails = getEmails()
+downloadAvatars(emails)
 fixGourceLog()
