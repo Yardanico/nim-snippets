@@ -11,7 +11,7 @@ type
 const ToCompile: seq[CompileEntry] = @[
   ("https://github.com/mratsim/Arraymancer", "tests/tests_cpu.nim", true, true),
   ("https://github.com/zevv/npeg", "tests/tests.nim", true, true),
-  #("https://github.com/planety/prologue", "examples/todolist/app.nim", true, true),
+  ("https://github.com/planety/prologue", "examples/todoapp/app.nim", true, true),
   ("https://github.com/zedeus/nitter", "src/nitter.nim", true, true),
   ("https://github.com/rlipsc/polymorph", "tests/testall.nim", true, true),
   ("https://github.com/nitely/nim-regex", "tests/tests.nim", true, true),
@@ -21,7 +21,7 @@ const ToCompile: seq[CompileEntry] = @[
 
 var 
   i = 1
-  isGcc = false
+  isGcc = true
 
 proc profileName(tmpDir: string, name: string) =
   let val = 
@@ -52,6 +52,7 @@ proc buildCompilerFirst(tmpDir, binName: string): string =
       @[
         "c", "-d:danger", "--cc:clang",
         "--passC:-fprofile-instr-generate", "--passL:-fprofile-instr-generate",
+        "--passC:-flto", "--passL:-flto",
         "-o:bin/" & binName, "compiler/nim.nim"
       ]
     else:
@@ -59,6 +60,7 @@ proc buildCompilerFirst(tmpDir, binName: string): string =
         "c", "-d:danger", "--cc:gcc",
         fmt"--passC:-fprofile-generate={tmpDir}/profiles/%q{{GCCPROF}}", 
         fmt"--passL:-fprofile-generate={tmpDir}/profiles/%q{{GCCPROF}}",
+        "--passC:-flto", "--passL:-flto",
         "-o:bin/" & binName, "compiler/nim.nim"
       ]
     
@@ -72,6 +74,7 @@ proc buildCompilerSecond(tmpDir, binName: string, profs: seq[string]) =
         "c", "-d:danger", "--cc:clang",
         fmt"--passC:-fprofile-instr-use={tmpDir}/main.profdata", 
         fmt"--passL:-fprofile-instr-use={tmpDir}/main.profdata",
+        "--passC:-flto", "--passL:-flto",
         "-o:bin/" & binName, "compiler/nim.nim"
       ]
     else:
@@ -79,6 +82,7 @@ proc buildCompilerSecond(tmpDir, binName: string, profs: seq[string]) =
         "c", "-d:danger", "--cc:gcc",
         fmt"--passC:-fprofile-use={tmpDir}/profiles/main --passC:-fprofile-correction", 
         fmt"--passL:-fprofile-use={tmpDir}/profiles/main --passL:-fprofile-correction",
+        "--passC:-flto", "--passL:-flto",
         "-o:bin/" & binName, "compiler/nim.nim"
       ]
 
