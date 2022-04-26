@@ -20,7 +20,7 @@ import std / [
 # Nimble
 import irc
 import regex
-import frosty
+import flatty
 
 when defined(nimHasStrictFuncs):
   {.experimental: "strictFuncs".}
@@ -129,6 +129,29 @@ proc parseFile(path: string) =
       # Events like joins/nickname changes, etc
       if nick == "*": continue
       msgs.add Entry(timestamp: ts.toTime.toUnix, author: nick, message: msg)
+  if ext == ".json":
+    var i = 0
+    for line in lines(path):
+      var line = line
+      # skip timestamp
+      if i == 0: 
+        inc i 
+        continue
+      # Skip empty lines
+      if line.strip() == "": continue
+      #for field in ["numeric", "user", "host", "servername", "raw", "Field0", "Field1"]:
+      #  line = line.replace("\"" & field & "\": null", "\"" & field & "\": \"\"")
+      # Unmarshal
+      var entry: JsonNode
+      try:
+        entry = parseJson(line)
+      except:
+        echo "failed to parse line", line
+        continue
+      let ev = entry["msg"]
+      # If it's a normal message
+      if ev["typ"].getStr() == "EvMsg" and ev["params"].getElems().len > 1 and ev["origin"].getStr()[0] == '#':
+        msgs.add Entry(timestamp: entry["time"]["seconds"].getInt(), author: ev["nick"].getStr(), message: ev["params"].getElems()[1].getStr())
 
 proc saveInitial = 
   var start = getMonoTime()
@@ -144,9 +167,9 @@ proc saveInitial =
 
   msgs.sort(cmpEntry)
 
-  var handle = openFileStream("saved", fmWrite)
-  msgs.freeze(handle)
-  handle.close()
+  #var handle = openFileStream("saved", fmWrite)
+  writeFile("saved", msgs.toFlatty)
+  #handle.close()
   echo "Saved to disk, took ", (getMonoTime() - start)
   dates.sort()
 
@@ -175,9 +198,8 @@ proc saveSqlite =
                 )""")
 
   let start = getMonoTime()
-  var handle = openFileStream("saved", fmRead)
-
-  handle.thaw(msgs)
+  
+  msgs = fromFlatty(readFile("saved"), seq[Entry])
   echo msgs.len
   echo getMonoTime() - start
 
@@ -260,14 +282,18 @@ proc saveSqlite =
       "leorize[m]1": "leorize",
       "leorize_m": "leorize"
     })
-    db.exec(
-      sql"insert into log (timestamp, author, message, service, kind) values (?, ?, ?, ?, ?)",
-      ev.timestamp, nick, msg, service, action
-    )
+    try:
+      db.exec(
+        sql"insert into log (timestamp, author, message, service, kind) values (?, ?, ?, ?, ?)",
+        ev.timestamp, nick, msg, service, action
+      )
+    except DbError:
+      echo "DB error: ", ev.timestamp, " ", nick, " ", msg, " ", service, " ", action
+      echo getCurrentExceptionMsg()
 
   db.exec(sql"end transaction")
   db.close()
 
 
-saveInitial()
+#saveInitial()
 saveSqlite()
