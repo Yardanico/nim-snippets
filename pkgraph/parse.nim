@@ -16,6 +16,22 @@ type
     license: string
     version: string
 
+const
+  PkgBlacklist = [
+    "nim", "nimrod", "unixcmd", 
+    "fastrpc", # nephyr depends on it but it's not in Nimble
+    "mcdb", # mcdb is not in Nimble, mctranslog depends on it,
+    "fragments",
+    "nblosc",
+    "strings",
+    "gradient",
+    "xio",
+    "easygl",
+    "nitter",
+    "a", # temp maybe remove and fix npeg comment (bung slim)
+    "goto"
+  ]
+
 let parser = peg("file", req: PackageData):
 
   nl <- {' ', '\t', '\9' .. '\13'}
@@ -39,7 +55,7 @@ let parser = peg("file", req: PackageData):
   file <- *@(version | author | license | requires)
 
 # For resolving aliases
-let x = parseFile("pkgs.json")
+let x = parseFile("packages.json")
 var aliases = newTable[string, string]()
 for obj in x.elems:
   if "alias" in obj:
@@ -79,7 +95,7 @@ proc addNimbleToGraph(graph: TableRef[string, PackageData], pkgname, path: strin
       if name in aliases:
         name = aliases[name]
       # unixcmd was commented
-      if name notin ["nim", "nimrod", "unixcmd"]: pkgs.add name
+      if name notin PkgBlacklist: pkgs.add name
   # update with new packages
   pkgData.pkgs = pkgs.deduplicate()
   graph[normalize(pkgname)] = pkgData
@@ -172,7 +188,8 @@ proc main =
         createStmts.add fmt"create ({strId}:package {{pkgname: '{pkg}'}})"
         relationStmts.add fmt"create ({varname})-[:depends_on]->({strId})"
       else:
-        quit pkg
+        echo val
+        quit fmt"A package {key} directly depends on {pkg} but it's not in Nimble"
   
   when false:
     for key, val in graph:

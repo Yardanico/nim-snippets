@@ -1,0 +1,27 @@
+arturo - Can't find .nimble file - https://github.com/arturo-lang/arturo
+
+orient - Can't find .nimble file (the branch with the code is not the default one) - https://github.com/philip-wernersbach/nim-orient
+
+geohash - Can't find .nimble file - https://github.com/twist-vector/nim-geohash
+
+fragments - Can't find .nimble file (repo seems to be rewritten in Rust) - https://github.com/fragcolor-xyz/fragments
+
+jq - Can't find .nimble file - https://github.com/alialrahahleh/fjq
+
+nephyr - Requires a package that's not in Nimble (fastrpc) - https://github.com/EmbeddedNim/nephyr/
+
+mctranslog - depends on mcdb but it's not in Nimble - https://github.com/abbeymart/mctranslog/
+
+torch - depends on fragments (https://github.com/sinkingsugar/fragments) but it's not in Nimble - https://github.com/sinkingsugar/nimtorch
+
+nimhdf5 - depends on nblosc (https://github.com/Vindaar/nblosc) but it's not in Nimble - https://github.com/Vindaar/nimhdf5
+
+astdots - depends on strings but it's not in Nimble (can't find the repo) - https://github.com/Rekihyt/astdot/
+
+spinner - depends on gradient but it's not in Nimble - https://github.com/tonogram/spinner
+
+fsnotify - depends on xio (https://github.com/ringabout/Xio) but it's not in Nimble - https://github.com/planety/fsnotify. Nimble has `xio` package that links to https://github.com/ringabout/async but the repo doesn't exist.
+
+fision - depends on easygl (https://github.com/jackmott/easygl) and other packages that are not in Nimble - https://github.com/juancarlospaco/fision
+
+https://github.com/bung87/crowngui - depends on goto (maybe https://github.com/sls1005/nim-goto ?) but it's not in Nimble
