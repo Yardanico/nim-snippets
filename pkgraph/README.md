@@ -54,3 +54,13 @@ match (p1: package)-[:authored_by]->(a1: author {name: 'Andreas Rumpf'})
 optional match (p2: package)-[:depends_on*]->(p1)
 return count(distinct p1), count(distinct p2), collect(p1), a1, collect(p2), collect(a2)
 ```
+
+
+Find authors with most packages:
+```sql
+MATCH (p: package)-[:authored_by]->(a: author) 
+WITH a, COUNT(p) AS pkgcount, collect(p) AS packages
+ORDER BY pkgcount DESC 
+LIMIT 50
+RETURN a.name, pkgcount
+```

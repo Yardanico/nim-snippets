@@ -19,7 +19,9 @@ for pkg in data:
     # Add subdir info to an existing repo
     if subdir != "":
       var f = open(dir / "subdir.meta", fmAppend)
-      f.writeLine(subdir)
+      # We should put the actual package name, not the subdir name!
+      # See pl0t/api/nim
+      f.writeLine(pkg["name"].getStr())
       f.close()
     continue
 
