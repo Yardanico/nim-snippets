@@ -1,11 +1,14 @@
 # bad code ahead, you've been warned!
 import std/[os, osproc, strutils, strformat, tempfiles]
 
-import pkg/shell
 type
   CompileEntry = tuple
     url, file: string
     nimble, orc: bool
+
+const 
+  IsOrcDefault = true
+  IsGcc = false
 
 # repo, path to file to compile, can compile with orc?
 const ToCompile: seq[CompileEntry] = @[
@@ -14,41 +17,42 @@ const ToCompile: seq[CompileEntry] = @[
   ("https://github.com/planety/prologue", "examples/todoapp/app.nim", true, true),
   ("https://github.com/zedeus/nitter", "src/nitter.nim", true, true),
   ("https://github.com/rlipsc/polymorph", "tests/testall.nim", true, true),
-  ("https://github.com/nitely/nim-regex", "tests/tests.nim", true, true),
+  ("https://github.com/nim-lang/nim-regex", "tests/tests.nim", true, true),
   ("https://github.com/nim-lang/nim", "compiler/nim.nim", false, true)
 ]
 
 
 var 
   i = 1
-  isGcc = true
 
 proc profileName(tmpDir: string, name: string) =
   let val = 
-    if isGcc:
+    if IsGcc:
       tmpDir / "profiles" / (name & $i)
     else:
       tmpDir / "profiles" / (name & $i & ".profraw")
-  putEnv(if isGcc: "GCCPROF" else: "LLVM_PROFILE_FILE", val)
+  putEnv(if IsGcc: "GCCPROF" else: "LLVM_PROFILE_FILE", val)
   inc i
 
 proc compilePgo(compBin, tmpDir, name, filePath: string, orc: bool) = 
   # We also compile without danger so that the paths related
   # to debug code (assertions, safety checks, etc) also get optimized
+  let nimbleDir = tmpDir / "nimble/"
+  let commonArgs = fmt"c --clearNimblePath --NimblePath:{nimbleDir}/pkgs/ --NimblePath:{nimbleDir}/pkgs2/ -f --compileOnly"
   profileName(tmpDir, name)
-  doAssert execCmd(fmt"{compBin} c -f --compileOnly {filePath}") == 0
+  doAssert execCmd(fmt"{compBin} {commonArgs} {filePath}") == 0
   profileName(tmpDir, name)
-  doAssert execCmd(fmt"{compBin} c -f --compileOnly -d:danger {filePath}") == 0
-  if orc:
+  doAssert execCmd(fmt"{compBin} {commonArgs} -d:danger {filePath}") == 0
+  if orc and not IsOrcDefault:
     profileName(tmpDir, name)
-    doAssert execCmd(fmt"{compBin} c -f --compileOnly -d:orc {filePath}") == 0
+    doAssert execCmd(fmt"{compBin} {commonArgs} --mm:orc {filePath}") == 0
     profileName(tmpDir, name)
-    doAssert execCmd(fmt"{compBin} c -f --compileOnly -d:orc -d:danger {filePath}") == 0
+    doAssert execCmd(fmt"{compBin} {commonArgs} --mm:orc -d:danger {filePath}") == 0
 
 
 proc buildCompilerFirst(tmpDir, binName: string): string = 
   let args = 
-    if not isGcc:
+    if not IsGcc:
       @[
         "c", "-d:danger", "--cc:clang",
         "--passC:-fprofile-instr-generate", "--passL:-fprofile-instr-generate",
@@ -69,7 +73,7 @@ proc buildCompilerFirst(tmpDir, binName: string): string =
 
 proc buildCompilerSecond(tmpDir, binName: string, profs: seq[string]) =   
   let args = 
-    if not isGcc:
+    if not IsGcc:
       @[
         "c", "-d:danger", "--cc:clang",
         fmt"--passC:-fprofile-instr-use={tmpDir}/main.profdata", 
@@ -100,7 +104,7 @@ proc main =
   # compile and generate profiles for all projects
   for entry in ToCompile:
     let entryName = entry.url.split("/")[^1]
-    # depth=1 so no submodules, maybe also an additional bool?
+    # depth=1 so no history, maybe also an additional bool?
     doAssert execCmd(fmt"git clone --depth=1 {entry.url}") == 0
     setCurrentDir(entryName)
     # if the project has nimble deps, install them
@@ -111,7 +115,7 @@ proc main =
   
   # find names for all the generated profiles
   var profs: seq[string]
-  if not isGcc:
+  if not IsGcc:
     for pc in walkDir(tmpDir / "profiles"):
       if pc.kind == pcFile and pc.path.endsWith(".profraw"):
         profs.add pc.path
