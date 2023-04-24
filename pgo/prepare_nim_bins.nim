@@ -16,25 +16,13 @@
 
 import std/[strformat, strutils, osproc]
 
-type
-  Flags = enum
-    release, danger, lto, pgo
-  Compiler = enum
-    gcc, clang
-
-let versions = @[
-  ({release}, "rel"), 
-  ({danger}, "dan"),
-  ({release, lto}, "rel_lto"), 
-  ({danger, lto}, "dan_lto"),
-  #({danger, pgo}, "_pgo") - compiled manually for now :)
-]
+import ./common
 
 const NimBin = "nim_pgo_clang"
 
 for comp in Compiler:
   for version in versions:
-    let binName = fmt"nim_{comp}_{version[1]}"
+    let binName = versionName(comp, version)
     var flags = @["c", fmt"--cc:{comp}", "--verbosity:0"]
     for flag in version[0]:
       flags.add case flag
@@ -43,7 +31,7 @@ for comp in Compiler:
         of lto: "--passC:-flto --passL:-flto"
         # todo
         of pgo: ""
-    flags.add fmt"-o:{binName}"
+    flags.add fmt"-o:testbins/{binName}"
     flags.add "compiler/nim.nim"
     echo fmt"Building {binName}"
     let cmd = NimBin & " " & flags.join(" ")
