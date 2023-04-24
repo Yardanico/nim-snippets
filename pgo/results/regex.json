@@ -1,0 +1,234 @@
+{
+  "results": [
+    {
+      "command": "/home/dian/Things/nim/testbins/nim_gcc_rel c -d:release --compileOnly tests/tests.nim",
+      "mean": 22.533754964526665,
+      "stddev": 0.29008576914681766,
+      "median": 22.36952046686,
+      "user": 21.8240244,
+      "system": 0.59043082,
+      "min": 22.36304811286,
+      "max": 22.86869631386,
+      "times": [
+        22.36952046686,
+        22.86869631386,
+        22.36304811286
+      ],
+      "exit_codes": [
+        0,
+        0,
+        0
+      ],
+      "parameters": {
+        "compiler": "nim_gcc_rel"
+      }
+    },
+    {
+      "command": "/home/dian/Things/nim/testbins/nim_gcc_dan c -d:release --compileOnly tests/tests.nim",
+      "mean": 20.309674988526666,
+      "stddev": 0.08588506363310287,
+      "median": 20.299612161859997,
+      "user": 19.655650399999995,
+      "system": 0.5562824866666667,
+      "min": 20.22926461586,
+      "max": 20.400148187859998,
+      "times": [
+        20.299612161859997,
+        20.22926461586,
+        20.400148187859998
+      ],
+      "exit_codes": [
+        0,
+        0,
+        0
+      ],
+      "parameters": {
+        "compiler": "nim_gcc_dan"
+      }
+    },
+    {
+      "command": "/home/dian/Things/nim/testbins/nim_gcc_rel_lto c -d:release --compileOnly tests/tests.nim",
+      "mean": 19.144480730526666,
+      "stddev": 0.13414421872576116,
+      "median": 19.21640744886,
+      "user": 18.685414399999996,
+      "system": 0.36918448666666664,
+      "min": 18.98971256586,
+      "max": 19.22732217686,
+      "times": [
+        19.22732217686,
+        18.98971256586,
+        19.21640744886
+      ],
+      "exit_codes": [
+        0,
+        0,
+        0
+      ],
+      "parameters": {
+        "compiler": "nim_gcc_rel_lto"
+      }
+    },
+    {
+      "command": "/home/dian/Things/nim/testbins/nim_gcc_dan_lto c -d:release --compileOnly tests/tests.nim",
+      "mean": 17.706757105193333,
+      "stddev": 0.11575740158273974,
+      "median": 17.640406182859998,
+      "user": 17.326811733333333,
+      "system": 0.29228615333333335,
+      "min": 17.63944404786,
+      "max": 17.840421084859997,
+      "times": [
+        17.63944404786,
+        17.640406182859998,
+        17.840421084859997
+      ],
+      "exit_codes": [
+        0,
+        0,
+        0
+      ],
+      "parameters": {
+        "compiler": "nim_gcc_dan_lto"
+      }
+    },
+    {
+      "command": "/home/dian/Things/nim/testbins/nim_gcc_pgo c -d:release --compileOnly tests/tests.nim",
+      "mean": 12.155331018860002,
+      "stddev": 0.2984446259783011,
+      "median": 12.18504602286,
+      "user": 11.818034066666664,
+      "system": 0.27349481999999997,
+      "min": 11.84314043986,
+      "max": 12.437806593860001,
+      "times": [
+        12.437806593860001,
+        12.18504602286,
+        11.84314043986
+      ],
+      "exit_codes": [
+        0,
+        0,
+        0
+      ],
+      "parameters": {
+        "compiler": "nim_gcc_pgo"
+      }
+    },
+    {
+      "command": "/home/dian/Things/nim/testbins/nim_clang_rel c -d:release --compileOnly tests/tests.nim",
+      "mean": 23.90558960952667,
+      "stddev": 0.30788823911708874,
+      "median": 23.74753069486,
+      "user": 23.486842733333333,
+      "system": 0.2824801533333334,
+      "min": 23.70883255086,
+      "max": 24.26040558286,
+      "times": [
+        23.70883255086,
+        24.26040558286,
+        23.74753069486
+      ],
+      "exit_codes": [
+        0,
+        0,
+        0
+      ],
+      "parameters": {
+        "compiler": "nim_clang_rel"
+      }
+    },
+    {
+      "command": "/home/dian/Things/nim/testbins/nim_clang_dan c -d:release --compileOnly tests/tests.nim",
+      "mean": 19.34263017686,
+      "stddev": 0.3963646759408115,
+      "median": 19.36961157986,
+      "user": 18.97102373333333,
+      "system": 0.2686731533333333,
+      "min": 18.933464154859998,
+      "max": 19.72481479586,
+      "times": [
+        18.933464154859998,
+        19.72481479586,
+        19.36961157986
+      ],
+      "exit_codes": [
+        0,
+        0,
+        0
+      ],
+      "parameters": {
+        "compiler": "nim_clang_dan"
+      }
+    },
+    {
+      "command": "/home/dian/Things/nim/testbins/nim_clang_rel_lto c -d:release --compileOnly tests/tests.nim",
+      "mean": 19.992677278193334,
+      "stddev": 0.18279349689242283,
+      "median": 20.09165011586,
+      "user": 19.65584773333333,
+      "system": 0.25933648666666664,
+      "min": 19.78173886786,
+      "max": 20.10464285086,
+      "times": [
+        20.10464285086,
+        19.78173886786,
+        20.09165011586
+      ],
+      "exit_codes": [
+        0,
+        0,
+        0
+      ],
+      "parameters": {
+        "compiler": "nim_clang_rel_lto"
+      }
+    },
+    {
+      "command": "/home/dian/Things/nim/testbins/nim_clang_dan_lto c -d:release --compileOnly tests/tests.nim",
+      "mean": 15.826781084193334,
+      "stddev": 0.05126600225846446,
+      "median": 15.83329024686,
+      "user": 15.4816614,
+      "system": 0.2691681533333334,
+      "min": 15.772571364860001,
+      "max": 15.874481640860001,
+      "times": [
+        15.874481640860001,
+        15.83329024686,
+        15.772571364860001
+      ],
+      "exit_codes": [
+        0,
+        0,
+        0
+      ],
+      "parameters": {
+        "compiler": "nim_clang_dan_lto"
+      }
+    },
+    {
+      "command": "/home/dian/Things/nim/testbins/nim_clang_pgo c -d:release --compileOnly tests/tests.nim",
+      "mean": 11.772262964193333,
+      "stddev": 0.06646426543532417,
+      "median": 11.802370253860001,
+      "user": 11.453604066666664,
+      "system": 0.2702541533333333,
+      "min": 11.69607289886,
+      "max": 11.81834573986,
+      "times": [
+        11.81834573986,
+        11.802370253860001,
+        11.69607289886
+      ],
+      "exit_codes": [
+        0,
+        0,
+        0
+      ],
+      "parameters": {
+        "compiler": "nim_clang_pgo"
+      }
+    }
+  ]
+}

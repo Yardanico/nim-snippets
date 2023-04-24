@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <title>plot_results.nim</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🐳</text></svg>">
+  <meta content="text/html; charset=utf-8" http-equiv="content-type">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <meta content="nimib 0.3.9" name="generator">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/light.min.css">
+  <link rel='stylesheet' href='https://cdn.jsdelivr.net/gh/pietroppeter/nimib/assets/atom-one-light.css'>
+    <script src="https://cdn.jsdelivr.net/gh/pietroppeter/nimib@main/assets/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+
+  <style>
+.nb-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nb-small {
+  font-size: 0.8rem;
+}
+button.nb-small {
+  float: right;
+  padding: 2px;
+  padding-right: 5px;
+  padding-left: 5px;
+}
+section#source {
+  display:none
+}
+pre > code {
+  font-size: 1.2em;
+}
+.nb-output {
+  line-height: 1.15;
+}
+</style>
+  
+</head>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script><body>
+<header>
+<div class="nb-box">
+  <span><a href=".">🏡</a></span>
+  <span><code>plot_results.nim</code></span>
+  <span><a href="https://github.com/Yardanico/nim-snippets"><svg aria-hidden="true" width="1.2em" height="1.2em" style="vertical-align: middle;" preserveAspectRatio="xMidYMid meet" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59c.4.07.55-.17.55-.38c0-.19-.01-.82-.01-1.49c-2.01.37-2.53-.49-2.69-.94c-.09-.23-.48-.94-.82-1.13c-.28-.15-.68-.52-.01-.53c.63-.01 1.08.58 1.23.82c.72 1.21 1.87.87 2.33.66c.07-.52.28-.87.51-1.07c-1.78-.2-3.64-.89-3.64-3.95c0-.87.31-1.59.82-2.15c-.08-.2-.36-1.02.08-2.12c0 0 .67-.21 2.2.82c.64-.18 1.32-.27 2-.27c.68 0 1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82c.44 1.1.16 1.92.08 2.12c.51.56.82 1.27.82 2.15c0 3.07-1.87 3.75-3.65 3.95c.29.25.54.73.54 1.48c0 1.07-.01 1.93-.01 2.2c0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z" fill="#000"></path></svg></a></span>
+</div>
+<hr>
+</header><main>
+<p>This page contains graphs that show compilation speed (in seconds) for some Nim projects.
+The compilation time <em>only</em>  includes Nim compilation time itself (including the creation of C files),
+but does not include the C compilation speed. Lower is better.</p>
+<p>Projects used for generating PGO profile data:</p>
+<ul>
+<li>Arraymancer</li>
+<li>NPeg</li>
+<li>Prologue</li>
+<li>Nitter</li>
+<li>Polymorph</li>
+<li>regex</li>
+<li>Nim compiler</li>
+</ul>
+<p>I chose some of these projects because they heavily use compile-time Nim execution or macros,
+some - because they use async (heavy on the static analysis done for ARC/ORC),
+and some - just because they need to be there.</p>
+<p>All projects were compiled with ORC in debug (to also optimize for debugging features) and release modes.</p>
+<p>Tests were done on my Arrch Linux machine (Ryzen 3700X, NVMe SSD) with GCC 12.2.1 and Clang 15.0.7.</p>
+<p>The benchmark data was collected using Hyperfine.
+Each option was benchmarked 3 times (low, I know) because I didn't want to wait too long for results.</p>
+<p>This page was done using <a href="https://github.com/pietroppeter/nimib">nimib</a> (the best out there!),
+plots were done with <a href="https://github.com/SciNim/nim-plotly/">nim-plotly</a>.</p>
+<p>Source code for all relevant files can be found in the
+<a href="https://github.com/Yardanico/nim-snippets/tree/master/pgo">pgo folder</a> of my snippets repo.</p>
+<div id="plot-0"></div>
+<script>
+  Plotly.newPlot('plot-0', [{"x":["Danger (LTO, PGO)","Danger (LTO)","Release (LTO)","Danger","Release"],"y":[3.85,5.16,5.42,5.7,6.04],"opacity":1.0,"mode":"lines","type":"bar","name":"GCC","text":["Danger (LTO, PGO)","Danger (LTO)","Release (LTO)","Danger","Release"],"marker":{"color":"#B5651D"}},{"x":["Danger (LTO, PGO)","Danger (LTO)","Danger","Release (LTO)","Release"],"y":[3.52,4.62,5.24,5.63,6.31],"opacity":1.0,"mode":"lines","type":"bar","name":"Clang","text":["Danger (LTO, PGO)","Danger (LTO)","Danger","Release (LTO)","Release"],"marker":{"color":"#C0C0C0"}}], {"title":"Nim","yaxis":{"title":"Compile time (s)","autorange":true},"legend":{"orientation":"h","x":0.0,"y":1.0},"showlegend":true,"hovermode":"x"});
+</script>
+
+<p>The compiler itself. PGO speedup here is quite significant (<strong>1.7x</strong> over normal release).
+And we can already see that Clang is consistently faster than GCC if the compilation involves LTO or PGO ;)</p>
+<p>Now, how about we test it on some projects that were in the PGO training data?</p>
+<div id="plot-1"></div>
+<script>
+  Plotly.newPlot('plot-1', [{"x":["Danger (LTO, PGO)","Danger (LTO)","Release (LTO)","Danger","Release"],"y":[3.3,4.53,4.7,4.89,5.3],"opacity":1.0,"mode":"lines","type":"bar","name":"GCC","text":["Danger (LTO, PGO)","Danger (LTO)","Release (LTO)","Danger","Release"],"marker":{"color":"#B5651D"}},{"x":["Danger (LTO, PGO)","Danger (LTO)","Danger","Release (LTO)","Release"],"y":[3.15,4.11,4.6,5.05,5.66],"opacity":1.0,"mode":"lines","type":"bar","name":"Clang","text":["Danger (LTO, PGO)","Danger (LTO)","Danger","Release (LTO)","Release"],"marker":{"color":"#C0C0C0"}}], {"title":"Arraymancer","yaxis":{"title":"Compile time (s)","autorange":true},"legend":{"orientation":"h","x":0.0,"y":1.0},"showlegend":true,"hovermode":"x"});
+</script>
+
+<p>Clang PGO again comes out on top.</p>
+<div id="plot-2"></div>
+<script>
+  Plotly.newPlot('plot-2', [{"x":["Danger (LTO, PGO)","Danger (LTO)","Release (LTO)","Danger","Release"],"y":[1.35,1.87,1.98,2.08,2.22],"opacity":1.0,"mode":"lines","type":"bar","name":"GCC","text":["Danger (LTO, PGO)","Danger (LTO)","Release (LTO)","Danger","Release"],"marker":{"color":"#B5651D"}},{"x":["Danger (LTO, PGO)","Danger (LTO)","Danger","Release (LTO)","Release"],"y":[1.31,1.72,1.97,2.11,2.37],"opacity":1.0,"mode":"lines","type":"bar","name":"Clang","text":["Danger (LTO, PGO)","Danger (LTO)","Danger","Release (LTO)","Release"],"marker":{"color":"#C0C0C0"}}], {"title":"Moe","yaxis":{"title":"Compile time (s)","autorange":true},"legend":{"orientation":"h","x":0.0,"y":1.0},"showlegend":true,"hovermode":"x"});
+</script>
+
+<p>A text editor made in Nim that has a very cute name ^_^. And at this point it's clear - the results
+for different projects are all mostly <em>consistent</em> to each other regarding how fast is a specific combination
+to another one. Yes, some projects compile faster, but the actual percentage difference
+between versions is the same ¯_(ツ)_/¯.</p>
+<div id="plot-3"></div>
+<script>
+  Plotly.newPlot('plot-3', [{"x":["Danger (LTO, PGO)","Danger (LTO)","Release (LTO)","Danger","Release"],"y":[0.54,0.76,0.79,0.85,0.9],"opacity":1.0,"mode":"lines","type":"bar","name":"GCC","text":["Danger (LTO, PGO)","Danger (LTO)","Release (LTO)","Danger","Release"],"marker":{"color":"#B5651D"}},{"x":["Danger (LTO, PGO)","Danger (LTO)","Danger","Release (LTO)","Release"],"y":[0.52,0.6899999999999999,0.79,0.85,0.9399999999999999],"opacity":1.0,"mode":"lines","type":"bar","name":"Clang","text":["Danger (LTO, PGO)","Danger (LTO)","Danger","Release (LTO)","Release"],"marker":{"color":"#C0C0C0"}}], {"title":"Owlkettle (TODO app)","yaxis":{"title":"Compile time (s)","autorange":true},"legend":{"orientation":"h","x":0.0,"y":1.0},"showlegend":true,"hovermode":"x"});
+</script>
+
+<p>I was really surprised by Owlkettle being so fast! This is not compiling all of Owklettle, just the TODO app.
+With PGO you get 0.5 seconds for the Nim part, although the C compilation takes an additional 3.3 seconds (without C cache).
+If it wasn't already evident - PGO'd Nim compiler is only good for big Nim projects. The smaller the project,
+the less of a difference you'll see.</p>
+<div id="plot-4"></div>
+<script>
+  Plotly.newPlot('plot-4', [{"x":["Danger (LTO, PGO)","Danger (LTO)","Release (LTO)","Danger","Release"],"y":[12.16,17.71,19.14,20.31,22.53],"opacity":1.0,"mode":"lines","type":"bar","name":"GCC","text":["Danger (LTO, PGO)","Danger (LTO)","Release (LTO)","Danger","Release"],"marker":{"color":"#B5651D"}},{"x":["Danger (LTO, PGO)","Danger (LTO)","Danger","Release (LTO)","Release"],"y":[11.77,15.83,19.34,19.99,23.91],"opacity":1.0,"mode":"lines","type":"bar","name":"Clang","text":["Danger (LTO, PGO)","Danger (LTO)","Danger","Release (LTO)","Release"],"marker":{"color":"#C0C0C0"}}], {"title":"regex (Nimble)","yaxis":{"title":"Compile time (s)","autorange":true},"legend":{"orientation":"h","x":0.0,"y":1.0},"showlegend":true,"hovermode":"x"});
+</script>
+
+<p>regex is a pure-Nim regex library, which means you can both pre-compile and use regexes at compile-time.
+It's quite VM heavy, and the test file for it takes a really really long time to compile,
+because it has tons of different regexes that are all tested on both runtime and compile-time.
+The results are indeed quite significant - seems like the Nim VM was heavily optimized by PGO.
+I think it won't hurt to use a PGO'd compiler if you use nim-regex in your Nim project a lot :)</p>
+<h1>Conclusion</h1>
+<p>This was a fun experiment, although the graphs were a bit too boring - the scaling is similar in all of them.</p>
+<p>It's just another confirmation that Nim programs do benefit from LTO and PGO (see e.g. <a href="https://forum.nim-lang.org/t/6295">my old forum post</a>).
+However, the difference for the compiler is not that big,
+especially when compiling smaller Nim libraries/projects.</p>
+<p>Judging by those results,  you should look at how long a typical compilation of your project
+takes with <code>--compileOnly</code>, divide than by 1.7, and see if that time decrease
+will be significant enough for you, considering the C compilation time.
+Though do not forget that when developing your project you'll be re-using
+most of the C files, so the C compilation time will be quite low enough to make Nim compilation time noticeable,
+unless your project takes
+a significant time to link.</p>
+<p>Also, PGO for the compiler will (mostly) become obsolete when Nim gets incremental compilation, which I believe is on the roadmap for 2023.</p>
+<p>P.S.: If your Nim project does some heavy data processing,
+it won't hurt to try doing PGO on it,
+and as for LTO - you should generally always use it for release builds
+unless it slows your program down or results in some bugs.</p>
+<p>Thanks for reading this not particularly useful post.</p>
+</main>
+<footer>
+<div class="nb-box">
+  <span><span class="nb-small">made with <a href="https://pietroppeter.github.io/nimib/">nimib 🐳</a></span></span>
+  <span></span>
+  <span><button class="nb-small" id="show" onclick="toggleSourceDisplay()">Show Source</button></span>
+</div>
+</footer>
+<section id="source">
+<pre><code class="nohighlight nim hljs"><span class="hljs-keyword">import</span> std/[json, strutils, strformat, sequtils, algorithm, strscans, tables, math]
+<span class="hljs-keyword">import</span> pkg/[nimib, plotly, chroma]
+
+<span class="hljs-keyword">import</span> ./common
+
+nbInit
+
+<span class="hljs-comment"># nb.darkMode - no clue how to make plotly dark</span>
+
+<span class="hljs-comment"># https://pietroppeter.github.io/nblog/drafts/show_plotly.html</span>
+<span class="hljs-keyword">template</span> usePlotly(doc: <span class="hljs-keyword">var</span> <span class="hljs-type">NbDoc</span>) =
+  <span class="hljs-keyword">import</span> plotly / [api, plotly_types, plotly_display]
+  <span class="hljs-comment"># I should create a doc.addToHead proc for this:</span>
+  doc.partials[<span class="hljs-string">&quot;head&quot;</span>] &amp;= <span class="hljs-string">&quot;&quot;&quot;&lt;script src=&quot;https://cdn.plot.ly/plotly-latest.min.js&quot;&gt;&lt;/script&gt;&quot;&quot;&quot;</span>
+  doc.partials[<span class="hljs-string">&quot;nbPlotly&quot;</span>] = <span class="hljs-string">&quot;&quot;&quot;
+&lt;div id=&quot;{{plot_id}}&quot;&gt;&lt;/div&gt;
+&lt;script&gt;
+  Plotly.newPlot('{{plot_id}}', {{&amp;plot_data}}, {{&amp;plot_layout}});
+&lt;/script&gt;
+&quot;&quot;&quot;</span>
+nb.usePlotly
+
+<span class="hljs-keyword">template</span> nbPlotly(plot, body: <span class="hljs-built_in">untyped</span>) =
+  <span class="hljs-comment">## plot must be the identifier of Plotly's plot in body</span>
+  newNbCodeBlock(<span class="hljs-string">&quot;nbPlotly&quot;</span>, body):
+    body
+
+    nb.blk.context[<span class="hljs-string">&quot;plot_id&quot;</span>] = <span class="hljs-string">&quot;plot-&quot;</span> &amp; $nb.newid
+    nb.blk.context[<span class="hljs-string">&quot;plot_data&quot;</span>] = <span class="hljs-keyword">block</span>:
+      <span class="hljs-keyword">when</span> <span class="hljs-keyword">type</span>(plot) <span class="hljs-keyword">is</span> <span class="hljs-type">Plot</span>:
+        parseTraces(plot.traces)
+      <span class="hljs-keyword">else</span>:
+        $plot.traces
+
+    nb.blk.context[<span class="hljs-string">&quot;plot_layout&quot;</span>] = <span class="hljs-keyword">block</span>:
+      <span class="hljs-keyword">if</span> plot.layout != <span class="hljs-literal">nil</span>:
+        <span class="hljs-keyword">when</span> <span class="hljs-keyword">type</span>(plot) <span class="hljs-keyword">is</span> <span class="hljs-type">Plot</span>:
+          $(%plot.layout)
+        <span class="hljs-keyword">else</span>:
+          $plot.layout
+      <span class="hljs-keyword">else</span>:
+        <span class="hljs-string">&quot;{}&quot;</span>
+
+<span class="hljs-keyword">type</span>
+  <span class="hljs-type">HyperfineParams</span> = <span class="hljs-keyword">object</span>
+    compiler: <span class="hljs-built_in">string</span>
+  <span class="hljs-type">HyperfineResult</span> = <span class="hljs-keyword">object</span>
+    mean: <span class="hljs-built_in">float</span>
+    min: <span class="hljs-built_in">float</span>
+    max: <span class="hljs-built_in">float</span>
+    parameters: <span class="hljs-type">HyperfineParams</span>
+  <span class="hljs-type">BenchmarkResult</span> = <span class="hljs-keyword">object</span>
+    compiler: <span class="hljs-type">Compiler</span>
+    time: <span class="hljs-built_in">float</span>
+    text: <span class="hljs-built_in">string</span>
+
+<span class="hljs-keyword">proc</span> getBenchStats(data: <span class="hljs-type">JsonNode</span>): <span class="hljs-built_in">seq</span>[<span class="hljs-type">BenchmarkResult</span>] =
+  <span class="hljs-keyword">let</span> data = data[<span class="hljs-string">&quot;results&quot;</span>].to(<span class="hljs-built_in">seq</span>[<span class="hljs-type">HyperfineResult</span>])
+  <span class="hljs-keyword">for</span> run <span class="hljs-keyword">in</span> data:
+    <span class="hljs-keyword">let</span> (_, compStr, compFlags) = run.parameters.compiler.scanTuple(<span class="hljs-string">&quot;nim_$+_$+&quot;</span>)
+    <span class="hljs-keyword">let</span> compiler = parseEnum[<span class="hljs-type">Compiler</span>](compStr)
+    <span class="hljs-comment"># don't look here</span>
+    <span class="hljs-keyword">let</span> text = compFlags.multiReplace(
+      {<span class="hljs-string">&quot;_&quot;</span>: <span class="hljs-string">&quot; &quot;</span>, <span class="hljs-string">&quot;dan&quot;</span>: <span class="hljs-string">&quot;Danger&quot;</span>, <span class="hljs-string">&quot;rel&quot;</span>: <span class="hljs-string">&quot;Release&quot;</span>, <span class="hljs-string">&quot;lto&quot;</span>: <span class="hljs-string">&quot;(LTO)&quot;</span>, <span class="hljs-string">&quot;pgo&quot;</span>: <span class="hljs-string">&quot;Danger (LTO, PGO)&quot;</span>}
+    )
+    
+    <span class="hljs-literal">result</span>.add <span class="hljs-type">BenchmarkResult</span>(compiler: compiler, time: run.mean, text: text)
+
+<span class="hljs-keyword">proc</span> plotResults(filename, graphName: <span class="hljs-built_in">string</span>): <span class="hljs-type">Plot</span>[<span class="hljs-built_in">float</span>] = 
+  <span class="hljs-keyword">var</span> results = getBenchStats(parseFile filename)  
+  <span class="hljs-comment"># Sort by time</span>
+  results = results.sortedByIt(it.time)
+  <span class="hljs-comment"># Round the results to 2 decimal places</span>
+  <span class="hljs-keyword">for</span> res <span class="hljs-keyword">in</span> results.mitems:
+    res.time = res.time.round(<span class="hljs-number">2</span>)
+
+  <span class="hljs-comment">#let baseline = 1.0 #results[0].time</span>
+
+  <span class="hljs-keyword">var</span> yAxis = <span class="hljs-type">Axis</span>(title: <span class="hljs-string">&quot;Compile time (s)&quot;</span>)
+  <span class="hljs-comment"># Set the baseline as 0.9 of the lowest value, highest - 1.1 of the highest value</span>
+  <span class="hljs-comment">#yAxis.range = (baseline * 0.9, results[^1].time * 1.1)</span>
+
+  <span class="hljs-comment"># Colors chosen by Mr. Beef</span>
+  <span class="hljs-keyword">var</span> traces = @[
+    <span class="hljs-type">Trace</span>[<span class="hljs-built_in">float</span>](name: <span class="hljs-string">&quot;GCC&quot;</span>, `<span class="hljs-keyword">type</span>`: <span class="hljs-type">PlotType</span>.<span class="hljs-type">Bar</span>, opacity: <span class="hljs-number">1</span>, marker: <span class="hljs-type">Marker</span>[<span class="hljs-built_in">float</span>](color: @[parseHex(<span class="hljs-string">&quot;B5651D&quot;</span>)])),
+    <span class="hljs-type">Trace</span>[<span class="hljs-built_in">float</span>](name: <span class="hljs-string">&quot;Clang&quot;</span>, `<span class="hljs-keyword">type</span>`: <span class="hljs-type">PlotType</span>.<span class="hljs-type">Bar</span>, opacity: <span class="hljs-number">1</span>, marker: <span class="hljs-type">Marker</span>[<span class="hljs-built_in">float</span>](color: @[parseHex(<span class="hljs-string">&quot;C0C0C0&quot;</span>)]))
+  ]
+
+  <span class="hljs-comment"># Add our actual data and text</span>
+  <span class="hljs-keyword">for</span> res <span class="hljs-keyword">in</span> results:
+    traces[<span class="hljs-built_in">int</span> res.compiler].ys.add res.time
+    traces[<span class="hljs-built_in">int</span> res.compiler].text.add res.text
+  
+  <span class="hljs-comment"># HoverMode.X = Compare data on hover</span>
+  <span class="hljs-keyword">let</span> layout = <span class="hljs-type">Layout</span>(
+    title: graphName, yaxis: yAxis, 
+    autosize: <span class="hljs-literal">true</span>, hoverMode: <span class="hljs-type">HoverMode</span>.<span class="hljs-type">X</span>, showLegend: <span class="hljs-literal">true</span>, legend: <span class="hljs-type">Legend</span>(orientation: <span class="hljs-type">Orientation</span>.<span class="hljs-type">Horizontal</span>, x: <span class="hljs-number">0</span>, y: <span class="hljs-number">1</span>)
+  )
+  <span class="hljs-literal">result</span> = <span class="hljs-type">Plot</span>[<span class="hljs-built_in">float</span>](layout: layout, traces: traces)
+
+nbText:
+  <span class="hljs-string">&quot;&quot;&quot;
+  This page contains graphs that show compilation speed (in seconds) for some Nim projects.
+  The compilation time *only*  includes Nim compilation time itself (including the creation of C files),
+  but does not include the C compilation speed. Lower is better.
+
+  Projects used for generating PGO profile data:
+  - Arraymancer
+  - NPeg
+  - Prologue
+  - Nitter
+  - Polymorph
+  - regex
+  - Nim compiler
+  
+  I chose some of these projects because they heavily use compile-time Nim execution or macros, 
+  some - because they use async (heavy on the static analysis done for ARC/ORC), 
+  and some - just because they need to be there.
+
+  All projects were compiled with ORC in debug (to also optimize for debugging features) and release modes.
+
+  Tests were done on my Arrch Linux machine (Ryzen 3700X, NVMe SSD) with GCC 12.2.1 and Clang 15.0.7.
+
+  The benchmark data was collected using Hyperfine. 
+  Each option was benchmarked 3 times (low, I know) because I didn't want to wait too long for results.
+
+  This page was done using [nimib](https://github.com/pietroppeter/nimib) (the best out there!), 
+  plots were done with [nim-plotly](https://github.com/SciNim/nim-plotly/).
+
+  Source code for all relevant files can be found in the
+  [pgo folder](https://github.com/Yardanico/nim-snippets/tree/master/pgo) of my snippets repo.
+  &quot;&quot;&quot;</span>
+
+<span class="hljs-comment">#[
+nbPlotly(pltNimble):
+  let pltNimble = plotResults(&quot;results/nimble.json&quot;, &quot;Nimble&quot;)
+
+nbText:
+  &quot;&quot;&quot;
+  Nimble. Really fast to compile, even if PGO here is much faster, it's not much difference.
+  &quot;&quot;&quot;
+]#</span>
+
+nbPlotly(pltNim):
+  <span class="hljs-keyword">let</span> pltNim = plotResults(<span class="hljs-string">&quot;results/compiler.json&quot;</span>, <span class="hljs-string">&quot;Nim&quot;</span>)
+
+nbText:
+  <span class="hljs-string">&quot;&quot;&quot;
+  The compiler itself. PGO speedup here is quite significant (**1.7x** over normal release).
+  And we can already see that Clang is consistently faster than GCC if the compilation involves LTO or PGO ;)
+  &quot;&quot;&quot;</span>
+
+nbText:
+  <span class="hljs-string">&quot;&quot;&quot;
+  Now, how about we test it on some projects that were in the PGO training data?
+  &quot;&quot;&quot;</span>
+
+nbPlotly(pltArraymancer):
+  <span class="hljs-keyword">let</span> pltArraymancer = plotResults(<span class="hljs-string">&quot;results/arraymancer.json&quot;</span>, <span class="hljs-string">&quot;Arraymancer&quot;</span>)
+
+nbText:
+  <span class="hljs-string">&quot;&quot;&quot;
+  Clang PGO again comes out on top.
+  &quot;&quot;&quot;</span>
+
+nbPlotly(pltMoe):
+  <span class="hljs-keyword">let</span> pltMoe = plotResults(<span class="hljs-string">&quot;results/moe.json&quot;</span>, <span class="hljs-string">&quot;Moe&quot;</span>)
+
+nbText:
+  <span class="hljs-string">&quot;&quot;&quot;
+  A text editor made in Nim that has a very cute name ^_^. And at this point it's clear - the results
+  for different projects are all mostly *consistent* to each other regarding how fast is a specific combination
+  to another one. Yes, some projects compile faster, but the actual percentage difference 
+  between versions is the same ¯\_(ツ)_/¯.
+  &quot;&quot;&quot;</span>
+
+nbPlotly(pltOwlkettle):
+  <span class="hljs-keyword">let</span> pltOwlkettle = plotResults(<span class="hljs-string">&quot;results/owlkettle_todo.json&quot;</span>, <span class="hljs-string">&quot;Owlkettle (TODO app)&quot;</span>)
+
+nbText:
+  <span class="hljs-string">&quot;&quot;&quot;
+  I was really surprised by Owlkettle being so fast! This is not compiling all of Owklettle, just the TODO app.
+  With PGO you get 0.5 seconds for the Nim part, although the C compilation takes an additional 3.3 seconds (without C cache).
+  If it wasn't already evident - PGO'd Nim compiler is only good for big Nim projects. The smaller the project,
+  the less of a difference you'll see.
+  &quot;&quot;&quot;</span>
+
+nbPlotly(pltRegex):
+  <span class="hljs-keyword">let</span> pltRegex = plotResults(<span class="hljs-string">&quot;results/regex.json&quot;</span>, <span class="hljs-string">&quot;regex (Nimble)&quot;</span>)
+
+nbText:
+  <span class="hljs-string">&quot;&quot;&quot;
+  regex is a pure-Nim regex library, which means you can both pre-compile and use regexes at compile-time.
+  It's quite VM heavy, and the test file for it takes a really really long time to compile, 
+  because it has tons of different regexes that are all tested on both runtime and compile-time.
+  The results are indeed quite significant - seems like the Nim VM was heavily optimized by PGO. 
+  I think it won't hurt to use a PGO'd compiler if you use nim-regex in your Nim project a lot :)
+  &quot;&quot;&quot;</span>
+
+nbText:
+  <span class="hljs-string">&quot;&quot;&quot;
+  # Conclusion
+  This was a fun experiment, although the graphs were a bit too boring - the scaling is similar in all of them.
+  
+  It's just another confirmation that Nim programs do benefit from LTO and PGO (see e.g. [my old forum post](https://forum.nim-lang.org/t/6295)).
+  However, the difference for the compiler is not that big, 
+  especially when compiling smaller Nim libraries/projects. 
+  
+  Judging by those results,  you should look at how long a typical compilation of your project 
+  takes with `--compileOnly`, divide than by 1.7, and see if that time decrease
+  will be significant enough for you, considering the C compilation time. 
+  Though do not forget that when developing your project you'll be re-using
+  most of the C files, so the C compilation time will be quite low enough to make Nim compilation time noticeable,
+  unless your project takes
+  a significant time to link.
+  
+  Also, PGO for the compiler will (mostly) become obsolete when Nim gets incremental compilation, which I believe is on the roadmap for 2023.
+
+  P.S.: If your Nim project does some heavy data processing,
+  it won't hurt to try doing PGO on it,
+  and as for LTO - you should generally always use it for release builds
+  unless it slows your program down or results in some bugs.
+
+  Thanks for reading this not particularly useful post.
+  &quot;&quot;&quot;</span>
+
+nbSave</code></pre>
+</section><script>
+function toggleSourceDisplay() {
+  var btn = document.getElementById("show")
+  var source = document.getElementById("source");
+  if (btn.innerHTML=="Show Source") {
+    btn.innerHTML = "Hide Source";
+    source.style.display = "block";
+  } else {
+    btn.innerHTML = "Show Source";
+    source.style.display = "none";
+  }
+}
+</script></body>
+</html>

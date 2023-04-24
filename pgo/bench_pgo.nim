@@ -15,7 +15,9 @@ for comp in Compiler:
 let namesList = names.join(",")
 
 #let cmd = paramStr(1)
-let toBench = "c -d:release --compileOnly compiler/nim.nim"
+let toBench = "c -d:release --compileOnly tests/tests.nim"
+let name = "regex.json"
 
-let cmd = fmt"hyperfine -L compiler {namesList} 'testbins/{{compiler}} {toBench}' --runs 3 --export-json compiler.json"
+let cmd = fmt"hyperfine -L compiler {namesList} '/home/dian/Things/nim/testbins/{{compiler}} {toBench}' --runs 3 --export-json {name}"
 echo execCmd(cmd)
+copyFile(getCurrentDir() / name, "/home/dian/Projects/nim-snippets/pgo/results/" / name)
