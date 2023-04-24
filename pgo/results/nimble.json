@@ -1,0 +1,234 @@
+{
+  "results": [
+    {
+      "command": "testbins/nim_gcc_rel c -d:release --compileOnly dist/nimble/src/nimble.nim",
+      "mean": 2.0578577580733337,
+      "stddev": 0.004967969885546558,
+      "median": 2.05533341374,
+      "user": 1.9810814333333333,
+      "system": 0.056449919999999994,
+      "min": 2.05465882174,
+      "max": 2.06358103874,
+      "times": [
+        2.05533341374,
+        2.05465882174,
+        2.06358103874
+      ],
+      "exit_codes": [
+        0,
+        0,
+        0
+      ],
+      "parameters": {
+        "compiler": "nim_gcc_rel"
+      }
+    },
+    {
+      "command": "testbins/nim_gcc_dan c -d:release --compileOnly dist/nimble/src/nimble.nim",
+      "mean": 1.9453663250733335,
+      "stddev": 0.01781203367206644,
+      "median": 1.94484960074,
+      "user": 1.8785291,
+      "system": 0.05419692,
+      "min": 1.92781827574,
+      "max": 1.96343109874,
+      "times": [
+        1.94484960074,
+        1.96343109874,
+        1.92781827574
+      ],
+      "exit_codes": [
+        0,
+        0,
+        0
+      ],
+      "parameters": {
+        "compiler": "nim_gcc_dan"
+      }
+    },
+    {
+      "command": "testbins/nim_gcc_rel_lto c -d:release --compileOnly dist/nimble/src/nimble.nim",
+      "mean": 1.8099459090733336,
+      "stddev": 0.004028984217286217,
+      "median": 1.80987086374,
+      "user": 1.7404117666666667,
+      "system": 0.05969391999999999,
+      "min": 1.80595497174,
+      "max": 1.81401189174,
+      "times": [
+        1.81401189174,
+        1.80595497174,
+        1.80987086374
+      ],
+      "exit_codes": [
+        0,
+        0,
+        0
+      ],
+      "parameters": {
+        "compiler": "nim_gcc_rel_lto"
+      }
+    },
+    {
+      "command": "testbins/nim_gcc_dan_lto c -d:release --compileOnly dist/nimble/src/nimble.nim",
+      "mean": 1.7583474467400002,
+      "stddev": 0.04761908655122027,
+      "median": 1.73377410274,
+      "user": 1.6872914333333335,
+      "system": 0.05955125333333333,
+      "min": 1.7280349347400001,
+      "max": 1.81323330274,
+      "times": [
+        1.73377410274,
+        1.81323330274,
+        1.7280349347400001
+      ],
+      "exit_codes": [
+        0,
+        0,
+        0
+      ],
+      "parameters": {
+        "compiler": "nim_gcc_dan_lto"
+      }
+    },
+    {
+      "command": "testbins/nim_gcc_pgo c -d:release --compileOnly dist/nimble/src/nimble.nim",
+      "mean": 1.2346097440733332,
+      "stddev": 0.025241956438480245,
+      "median": 1.24298685074,
+      "user": 1.1736867666666668,
+      "system": 0.05251658666666666,
+      "min": 1.20624425074,
+      "max": 1.25459813074,
+      "times": [
+        1.20624425074,
+        1.25459813074,
+        1.24298685074
+      ],
+      "exit_codes": [
+        0,
+        0,
+        0
+      ],
+      "parameters": {
+        "compiler": "nim_gcc_pgo"
+      }
+    },
+    {
+      "command": "testbins/nim_clang_rel c -d:release --compileOnly dist/nimble/src/nimble.nim",
+      "mean": 2.1331772067399997,
+      "stddev": 0.03363847095643745,
+      "median": 2.14900072674,
+      "user": 2.0515060999999997,
+      "system": 0.06875092,
+      "min": 2.09454478774,
+      "max": 2.15598610574,
+      "times": [
+        2.14900072674,
+        2.09454478774,
+        2.15598610574
+      ],
+      "exit_codes": [
+        0,
+        0,
+        0
+      ],
+      "parameters": {
+        "compiler": "nim_clang_rel"
+      }
+    },
+    {
+      "command": "testbins/nim_clang_dan c -d:release --compileOnly dist/nimble/src/nimble.nim",
+      "mean": 1.7687525404066669,
+      "stddev": 0.022065289411540828,
+      "median": 1.77438821374,
+      "user": 1.6941844333333334,
+      "system": 0.06268258666666666,
+      "min": 1.74441595874,
+      "max": 1.78745344874,
+      "times": [
+        1.78745344874,
+        1.74441595874,
+        1.77438821374
+      ],
+      "exit_codes": [
+        0,
+        0,
+        0
+      ],
+      "parameters": {
+        "compiler": "nim_clang_dan"
+      }
+    },
+    {
+      "command": "testbins/nim_clang_rel_lto c -d:release --compileOnly dist/nimble/src/nimble.nim",
+      "mean": 1.9396694784066668,
+      "stddev": 0.01296288886297186,
+      "median": 1.94642365474,
+      "user": 1.8513597666666666,
+      "system": 0.07541025333333333,
+      "min": 1.92472423074,
+      "max": 1.9478605497400001,
+      "times": [
+        1.9478605497400001,
+        1.92472423074,
+        1.94642365474
+      ],
+      "exit_codes": [
+        0,
+        0,
+        0
+      ],
+      "parameters": {
+        "compiler": "nim_clang_rel_lto"
+      }
+    },
+    {
+      "command": "testbins/nim_clang_dan_lto c -d:release --compileOnly dist/nimble/src/nimble.nim",
+      "mean": 1.5668562560733335,
+      "stddev": 0.01854768779108864,
+      "median": 1.5585588967400001,
+      "user": 1.5068161,
+      "system": 0.048682253333333335,
+      "min": 1.55390575174,
+      "max": 1.58810411974,
+      "times": [
+        1.55390575174,
+        1.5585588967400001,
+        1.58810411974
+      ],
+      "exit_codes": [
+        0,
+        0,
+        0
+      ],
+      "parameters": {
+        "compiler": "nim_clang_dan_lto"
+      }
+    },
+    {
+      "command": "testbins/nim_clang_pgo c -d:release --compileOnly dist/nimble/src/nimble.nim",
+      "mean": 1.1736019434066665,
+      "stddev": 0.00946629488376055,
+      "median": 1.17373632374,
+      "user": 1.0942687666666666,
+      "system": 0.07057325333333332,
+      "min": 1.16406917374,
+      "max": 1.18300033274,
+      "times": [
+        1.16406917374,
+        1.17373632374,
+        1.18300033274
+      ],
+      "exit_codes": [
+        0,
+        0,
+        0
+      ],
+      "parameters": {
+        "compiler": "nim_clang_pgo"
+      }
+    }
+  ]
+}

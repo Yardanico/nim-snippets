@@ -1,6 +1,6 @@
 import ./common
 
-import std/[strutils, strformat, osproc]
+import std/[strutils, strformat, os, osproc]
 
 var myVersions = versions
 myVersions.add ({pgo}, "pgo")
@@ -14,5 +14,8 @@ for comp in Compiler:
 
 let namesList = names.join(",")
 
-let cmd = fmt"hyperfine -L compiler {namesList} 'testbins/{{compiler}} c -f -d:release --compileOnly compiler/nim.nim' --runs 3 --export-json testout.json"
+#let cmd = paramStr(1)
+let toBench = "c -d:release --compileOnly compiler/nim.nim"
+
+let cmd = fmt"hyperfine -L compiler {namesList} 'testbins/{{compiler}} {toBench}' --runs 3 --export-json compiler.json"
 echo execCmd(cmd)
