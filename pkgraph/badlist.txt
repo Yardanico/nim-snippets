@@ -14,7 +14,7 @@ mctranslog - depends on mcdb but it's not in Nimble - https://github.com/abbeyma
 
 torch - depends on fragments (https://github.com/sinkingsugar/fragments) but it's not in Nimble - https://github.com/sinkingsugar/nimtorch
 
-nimhdf5 - depends on nblosc (https://github.com/Vindaar/nblosc) but it's not in Nimble - https://github.com/Vindaar/nimhdf5
+nimhdf5 - depends on nblosc (https://github.com/Vindaar/nblosc) but it's not in Nimble - https://github.com/Vindaar/nimhdf5 - wrong issue, nimhdf5 has nblosc commented out
 
 astdots - depends on strings but it's not in Nimble (can't find the repo) - https://github.com/Rekihyt/astdot/
 
